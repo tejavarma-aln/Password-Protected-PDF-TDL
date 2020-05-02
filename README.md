@@ -28,7 +28,7 @@
 
 3)Load the tcp in tally - PdfLocker.txt
 
-4)Export Ledger Statement or Slaes Invoices by clicking on Encrypt PDF Button (Right Side)
+4)Export Ledger Statement or Sales Invoices by clicking on Encrypt PDF Button (Right Side)
 
 5)It will ask for user password and owner password
 
@@ -50,7 +50,7 @@
 
 4) Type regasm PdfLocker.dll /codebase ;;Give Full path of the PdfLocker.dll file
 
-5) you will get success message after it registered
+5) you will get a success message after it registered
 
 
 
