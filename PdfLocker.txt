@@ -1,0 +1,118 @@
+[#Form:Sales Color]
+	Add:Button:PdfLocker
+	
+[Button:PdfLocker]
+	Title:"Encrypt PDF"
+	Key:Ctrl+E
+	Action:Call:InitReportExport
+	
+	
+[#Report:LedgerVouchers]
+	Local:Form:Default:Add:Button:PdfLocker
+		
+[Function:InitReportExport]
+	
+	 Variable:PrintFileName:String
+	 Variables:PwdOwnerps,PwdUserps
+	 Local Formula:ComputeCPartyName:if $$Type = "Voucher" Then $PartyLedgerName else ##LedgerName
+	 Local Formula:SanitizedPartyName:$$StringFindAndReplace:@ComputeCPartyName:"/":"-"
+	 Local Formula:SanitizedPartyName2:$$StringFindAndReplace:@SanitizedPartyName:"\":"-"
+	 Variable:TargetFiletoLock:String
+	 
+    A1    :Create:PasswordAcceptDialog
+	A2    : If:(NOT $$IsEmpty:##PwdOwnerps ) and (NOT $$IsEmpty:##PwdUserps)
+	01	: SET : PrintFileName :if $$Type = "Voucher" then @SanitizedPartyName2+$$String:$Date+"-Invoice" else  @SanitizedPartyName2+$$String:##SvFromDate+"-"+$$String:##SvTodate+"-Statement"
+	03	: SET : SVExportFormat 	: $$SysName:PDF
+	04	: SET : SVPrintFileName	: $$MakeExportName:##PrintFileName:##SVExportFormat
+	05	: SET : SVOpenFileAfterExport : No
+	06	: EXPORT REPORT :.: TRUE
+	07    : SET:TargetFiletoLock:$$GetFileFullPath:##SVPrintFileName
+	08    : Exec COM Interface:PdfLockerAssembly:##TargetFiletoLock:##PwdUserps:##PwdOwnerps
+	09    : Msg Box:"Result":$$LastResult
+	10    : End If
+	
+[Report:PasswordAcceptDialog]
+	Title:"Enter Security Keys"
+	Form:PwdAcpDialog
+	Auto:Yes
+	
+[Form:PwdAcpDialog]
+	Part:PwdAcpDialog
+	
+[Part:PwdAcpDialog]
+	Height:30% page
+	Width:30% page
+	Space Left:2
+	Space Right:2
+	Lines:Pwdialogtitle,Pwdialoguserpass,Pwdialogownrpass
+	Bottom Lines:PwdDlgHelp1,PwdDlgHelp2
+	
+[Line:Pwdialogtitle]
+	Field:Name Field
+	Local:Field:Name Field:Info:"Enter Passwords"
+	Local:Field:Name Field:Full Width:Yes
+	Local:Field:Name Field:Align:Center
+	
+[Line:Pwdialoguserpass]
+	Field:MediumPrompt,PwdUserpass
+	Local:Field:MediumPrompt:Set as:"User Password"
+	Space Top:2
+	
+[Field:PwdUserpass]
+	Use:NameField
+	Full Width:Yes
+	Storage:PwdUserpass
+	Modifies:PwdUserps
+	Control:PwdCantEmpty:$$IsEmpty:$$Value
+	Case:Normal
+	
+[Line:Pwdialogownrpass]
+	Field:MediumPrompt,PwdOwnrpass
+	Local:Field:MediumPrompt:Set as:"Owner Password"
+	Space Top:1
+	
+[Field:PwdOwnrpass]
+	Use:NameField
+	Full Width:Yes
+	Storage:PwdOwnerpass
+	Modifies:PwdOwnerps
+	Control:PwdCantEmpty:$$IsEmpty:$$Value
+	Case:Normal
+	
+[Line:PwdDlgHelp1]
+	Field:SimpleField
+	Local:Field:SimpleField:Info:"*With user password they can view the file but can't alter"
+	Local:Field:Simple Field:Full Width:Yes
+	Local:Field:Simple Field:Color:Red
+	
+[Line:PwdDlgHelp2]
+	Field:SimpleField
+	Local:Field:SimpleField:Info:"*Passwords are case sensitive"
+	Local:Field:Simple Field:Full Width:Yes
+	Local:Field:Simple Field:Color:Red
+	
+[System:UDF]
+	PwdUserpass:String:1345
+	PwdOwnerpass:String:1346
+
+[Variable:PwdUserps]
+	Type:String
+	Volatile:Yes
+	
+[Variable:PwdOwnerps]
+	Type:String
+	Volatile:Yes
+	
+[System:Formulae]
+	PwdCantEmpty:"Sorry, Password Can't be Empty"
+	
+
+[COM Interface:PdfLockerAssembly]
+	Project:PdfLocker
+	Class:LockerClass
+	Interface:doencrypt
+	Parameter:P1:String
+	Parameter:P2:String
+	Parameter:P3:String
+	Return:String
+	
