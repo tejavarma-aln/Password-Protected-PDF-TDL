@@ -37,12 +37,12 @@
 7)PDF's will be Stored in Encrypted PDF's folder in Tally working directory(Tally Folder)
 
 
-** Registering the DLL**
+**Registering the DLL**
 
-2) Open CMD in administrator Mode (Elevated mode)
+1) Open CMD in administrator Mode (Elevated mode)
 
            For 64 Bit
-3) Type cd C:\Windows\Microsoft.NET\Framework64\v4.0.30319 ;; change directory
+2) Type cd C:\Windows\Microsoft.NET\Framework64\v4.0.30319 ;; change directory
 
            For 32 Bit
 3) Type cd C:\Windows\Microsoft.NET\Framework\v4.0.30319 ;; change directory
